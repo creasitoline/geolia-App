@@ -9,13 +9,13 @@
         :root { --primary: #ffffff; --text: #131921; --accent: #2ecc71; --bg: #f3f3f3; }
         body { font-family: 'Segoe UI', system-ui; margin: 0; background: var(--bg); padding-bottom: 90px; color: var(--text); }
         header { background: var(--primary); padding: 15px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #ddd; }
+        .logo-img { height: 40px; width: auto; object-fit: contain; }
         .main-layout { padding: 15px; }
         .tab-menu { display: flex; gap: 10px; margin-bottom: 20px; }
         .tab-btn { flex: 1; padding: 10px; border: none; border-radius: 10px; background: #ddd; cursor: pointer; font-weight: bold; }
         .tab-btn.active { background: var(--accent); color: white; }
         .card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #ddd; }
         
-        /* Classe per gestire la visibilità in modo pulito */
         .hidden { display: none !important; }
         
         #status { color: var(--accent); font-weight: bold; margin-top: 10px; }
@@ -28,7 +28,7 @@
 <body>
 
     <header>
-        <strong>GEOLIA</strong>
+        <img src="logo.png" alt="Geolia Logo" class="logo-img">
         <i class="fa-solid fa-user-circle"></i>
     </header>
 
