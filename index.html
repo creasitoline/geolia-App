@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Geolia | Gestione Integrata</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary: #ffffff; --text: #131921; --accent: #2ecc71; --bg: #f3f3f3; }
+        body { font-family: 'Segoe UI', system-ui; margin: 0; background: var(--bg); padding-bottom: 90px; color: var(--text); }
+        header { background: var(--primary); padding: 15px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #ddd; }
+        .main-layout { padding: 15px; }
+        .nav-bottom { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 15px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); border-radius: 20px 20px 0 0; }
+        .nav-item { text-decoration: none; color: #555; text-align: center; flex: 1; font-size: 12px; }
+        .nav-item i { display: block; font-size: 1.5rem; margin-bottom: 5px; }
+        .card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <strong>GEOLIA</strong>
+        <i class="fa-solid fa-user-circle"></i>
+    </header>
+
+    <div class="main-layout">
+        <div id="content-area">
+            <h3>Benvenuto in Geolia</h3>
+            <p>Caricamento dati in corso...</p>
+        </div>
+    </div>
+
+    <nav class="nav-bottom">
+        <a href="#" class="nav-item"><i class="fa-solid fa-house"></i>Home</a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-filter"></i>Filtri</a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-chart-line"></i>Admin</a>
+    </nav>
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geolia App</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 50px; background: #f4f4f4; }
+        .box { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>Geolia è Online!</h1>
+        <p>Il sistema è collegato correttamente al database.</p>
+        <p id="status"></p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDAJIxBD8qGO6h8lAZeLnotm7GySpZrz_8",
+            authDomain: "geolia-app.firebaseapp.com",
+            projectId: "geolia-app",
+            storageBucket: "geolia-app.firebasestorage.app",
+            messagingSenderId: "341223455235",
+            appId: "1:341223455235:web:6baa3fd3b9db6eaa22ec36",
+            measurementId: "G-7SPH65RFH7"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        document.getElementById('status').innerText = "Stato: Connessione al database riuscita.";
+    </script>
+</body>
+</html>
