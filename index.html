@@ -15,6 +15,7 @@
         .nav-item i { display: block; font-size: 1.5rem; margin-bottom: 5px; }
         .card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #ddd; }
         #status { color: var(--accent); font-weight: bold; margin-top: 10px; }
+        .btn-segnala { width: 100%; padding: 15px; border: none; border-radius: 10px; background: var(--accent); color: white; font-size: 16px; cursor: pointer; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -26,10 +27,15 @@
 
     <div class="main-layout">
         <div class="card">
-            <h3>Benvenuto in Geolia</h3>
+            <h3>Segnala un problema</h3>
             <p id="status">Verifica connessione in corso...</p>
+            
+            <button class="btn-segnala" onclick="document.getElementById('cameraInput').click()">
+                <i class="fa-solid fa-camera"></i> Scatta Foto
+            </button>
+            <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none" onchange="gestisciFoto(event)">
         </div>
-        </div>
+    </div>
 
     <nav class="nav-bottom">
         <a href="#" class="nav-item"><i class="fa-solid fa-house"></i>Home</a>
@@ -39,7 +45,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
-        import { getFirestore } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-storage.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDAJIxBD8qGO6h8lAZeLnotm7GySpZrz_8",
@@ -53,7 +60,33 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        document.getElementById('status').innerText = "Stato: Connessione al database riuscita.";
+        const storage = getStorage(app);
+        
+        document.getElementById('status').innerText = "Stato: Pronto per la segnalazione.";
+
+        window.gestisciFoto = async (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            document.getElementById('status').innerText = "Caricamento in corso...";
+
+            try {
+                const storageRef = ref(storage, 'segnalazioni/' + Date.now() + '_' + file.name);
+                const snapshot = await uploadBytes(storageRef, file);
+                const url = await getDownloadURL(snapshot.ref);
+
+                await addDoc(collection(db, "posts"), {
+                    foto: url,
+                    data: new Date().toISOString(),
+                    stato: "nuovo"
+                });
+
+                document.getElementById('status').innerText = "✅ Segnalazione inviata!";
+            } catch (error) {
+                console.error(error);
+                document.getElementById('status').innerText = "❌ Errore durante l'invio.";
+            }
+        };
     </script>
 </body>
 </html>
