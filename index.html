@@ -14,6 +14,7 @@
         .nav-item { text-decoration: none; color: #555; text-align: center; flex: 1; font-size: 12px; }
         .nav-item i { display: block; font-size: 1.5rem; margin-bottom: 5px; }
         .card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #ddd; }
+        #status { color: var(--accent); font-weight: bold; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -24,35 +25,17 @@
     </header>
 
     <div class="main-layout">
-        <div id="content-area">
+        <div class="card">
             <h3>Benvenuto in Geolia</h3>
-            <p>Caricamento dati in corso...</p>
+            <p id="status">Verifica connessione in corso...</p>
         </div>
-    </div>
+        </div>
 
     <nav class="nav-bottom">
         <a href="#" class="nav-item"><i class="fa-solid fa-house"></i>Home</a>
         <a href="#" class="nav-item"><i class="fa-solid fa-filter"></i>Filtri</a>
         <a href="#" class="nav-item"><i class="fa-solid fa-chart-line"></i>Admin</a>
     </nav>
-
-<!DOCTYPE html>
-<html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Geolia App</title>
-    <style>
-        body { font-family: sans-serif; text-align: center; padding: 50px; background: #f4f4f4; }
-        .box { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    </style>
-</head>
-<body>
-    <div class="box">
-        <h1>Geolia è Online!</h1>
-        <p>Il sistema è collegato correttamente al database.</p>
-        <p id="status"></p>
-    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
