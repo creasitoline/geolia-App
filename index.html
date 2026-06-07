@@ -3,139 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Geolia | Gestione Integrata</title>
+    <title>Geolia | Gestione</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --primary: #ffffff; --text: #131921; --accent: #2ecc71; --bg: #f3f3f3; }
-        body { font-family: 'Segoe UI', system-ui; margin: 0; background: var(--bg); padding-bottom: 90px; color: var(--text); }
-        header { background: var(--primary); padding: 15px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #ddd; }
-        .main-layout { padding: 15px; }
-        .tab-menu { display: flex; gap: 10px; margin-bottom: 20px; }
-        .tab-btn { flex: 1; padding: 10px; border: none; border-radius: 10px; background: #ddd; cursor: pointer; font-weight: bold; }
-        .tab-btn.active { background: var(--accent); color: white; }
-        .card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #ddd; }
-        
-        /* Classe per gestire la visibilità in modo pulito */
+        :root { --primary: #ffffff; --accent: #2ecc71; --bg: #f3f3f3; }
+        body { font-family: 'Segoe UI', system-ui; margin: 0; background: var(--bg); padding-bottom: 90px; }
+        header { background: var(--primary); padding: 15px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; }
+        .card { background: white; padding: 20px; border-radius: 15px; margin: 15px; border: 1px solid #ddd; }
         .hidden { display: none !important; }
-        
-        #status { color: var(--accent); font-weight: bold; margin-top: 10px; }
-        .btn-scatta { width: 100%; padding: 15px; border: none; border-radius: 10px; background: var(--accent); color: white; font-size: 16px; cursor: pointer; margin-top: 10px; }
-        .nav-bottom { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 15px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); border-radius: 20px 20px 0 0; }
-        .nav-item { text-decoration: none; color: #555; text-align: center; flex: 1; font-size: 12px; }
-        .nav-item i { display: block; font-size: 1.5rem; margin-bottom: 5px; }
+        .form-input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .btn-action { width: 100%; padding: 15px; border: none; border-radius: 10px; background: var(--accent); color: white; font-weight: bold; cursor: pointer; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-    <header>
-        <strong>GEOLIA</strong>
-        <i class="fa-solid fa-user-circle"></i>
-    </header>
+    <header><strong>GEOLIA</strong><i class="fa-solid fa-user-circle"></i></header>
 
-    <div class="main-layout">
-        <div class="tab-menu">
-            <button class="tab-btn active" onclick="mostraContenuto('segnalazioni', this)">Segnala</button>
-            <button class="tab-btn" onclick="mostraContenuto('offerte', this)">Offerte</button>
-        </div>
+    <div class="card">
+        <h3>Nuovo Post</h3>
+        <select id="catSelect" class="form-input">
+            <option value="offerte">🏷️ Offerte</option>
+            <option value="menu">🍽️ Menu del giorno</option>
+            <option value="marketplace">📦 Marketplace</option>
+            <option value="guasti">🛠️ Segnala Guasto</option>
+        </select>
 
-        <div id="area-segnalazioni" class="contenuto-zona">
-            <div class="card">
-                <h3>Segnala / Aggiungi</h3>
-                <p id="status">Pronto per lo scatto.</p>
-                
-                <img id="preview" class="hidden" style="width:100%; border-radius:10px; margin-bottom:10px;">
-                
-                <div id="controls" class="hidden" style="gap:10px; display:flex;">
-                    <button onclick="annullaFoto()" style="flex:1; padding:10px; border:none; background:#ff4757; color:white; border-radius:5px;">❌ Annulla</button>
-                    <button onclick="confermaFoto()" style="flex:1; padding:10px; border:none; background:var(--accent); color:white; border-radius:5px;">✅ Conferma</button>
-                </div>
+        <button id="btn-scatta" class="btn-action" onclick="document.getElementById('cameraInput').click()">
+            <i class="fa-solid fa-camera"></i> Scatta Foto
+        </button>
+        <button class="btn-action" style="background: #555;" onclick="document.getElementById('fileInput').click()">
+            <i class="fa-solid fa-folder"></i> Carica da Galleria
+        </button>
 
-                <button id="btn-scatta" class="btn-scatta" onclick="document.getElementById('cameraInput').click()">
-                    <i class="fa-solid fa-camera"></i> Scatta Foto
-                </button>
-                <input type="file" id="cameraInput" accept="image/*" capture="environment" class="hidden" onchange="mostraAnteprima(event)">
+        <div id="form-dati" class="hidden">
+            <img id="preview" style="width:100%; border-radius:10px; margin: 15px 0;">
+            <input type="text" id="titolo" class="form-input" placeholder="Titolo">
+            <textarea id="descrizione" class="form-input" placeholder="Descrizione"></textarea>
+            <div style="display:flex; gap:10px;">
+                <input type="number" id="prezzo" class="form-input" placeholder="Prezzo">
+                <select id="valuta" class="form-input" style="width:100px;"><option>CHF</option><option>EUR</option></select>
             </div>
-        </div>
-
-        <div id="area-offerte" class="contenuto-zona hidden">
-            <div class="card">
-                <h3>Offerte della settimana</h3>
-                <p>Nessuna offerta attiva al momento.</p>
-            </div>
+            <button class="btn-action" onclick="confermaInvio()">✅ Conferma Pubblicazione</button>
+            <button class="btn-action" style="background:#ff4757;" onclick="annullaTutto()">❌ Annulla</button>
         </div>
     </div>
 
-    <nav class="nav-bottom">
-        <a href="#" class="nav-item"><i class="fa-solid fa-house"></i>Home</a>
-        <a href="#" class="nav-item"><i class="fa-solid fa-filter"></i>Filtri</a>
-        <a href="#" class="nav-item"><i class="fa-solid fa-chart-line"></i>Admin</a>
-    </nav>
+    <input type="file" id="cameraInput" class="hidden" accept="image/*" capture="environment" onchange="gestisciFoto(event)">
+    <input type="file" id="fileInput" class="hidden" accept="image/*" onchange="gestisciFoto(event)">
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
         import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-storage.js";
 
-        const app = initializeApp({
-            apiKey: "AIzaSyDAJIxBD8qGO6h8lAZeLnotm7GySpZrz_8",
-            authDomain: "geolia-app.firebaseapp.com",
-            projectId: "geolia-app",
-            storageBucket: "geolia-app.firebasestorage.app",
-            messagingSenderId: "341223455235",
-            appId: "1:341223455235:web:6baa3fd3b9db6eaa22ec36",
-            measurementId: "G-7SPH65RFH7"
-        });
+        // CONFIGURA CON I TUOI DATI
+        const firebaseConfig = { /* ... */ }; 
+        const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const storage = getStorage(app);
         
         let fileTemporaneo = null;
 
-        window.mostraContenuto = (tipo, btn) => {
-            document.querySelectorAll('.contenuto-zona').forEach(z => z.classList.add('hidden'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('area-' + tipo).classList.remove('hidden');
-            btn.classList.add('active');
-        };
-
-        window.mostraAnteprima = (event) => {
-            const file = event.target.files[0];
-            if (!file) return;
-            fileTemporaneo = file;
+        window.gestisciFoto = (e) => {
+            fileTemporaneo = e.target.files[0];
             const reader = new FileReader();
-            reader.onload = (e) => {
-                document.getElementById('preview').src = e.target.result;
-                document.getElementById('preview').classList.remove('hidden');
-                document.getElementById('controls').classList.remove('hidden');
+            reader.onload = (ev) => {
+                document.getElementById('preview').src = ev.target.result;
+                document.getElementById('form-dati').classList.remove('hidden');
                 document.getElementById('btn-scatta').classList.add('hidden');
-                document.getElementById('status').innerText = "Anteprima: va bene?";
             };
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(fileTemporaneo);
         };
 
-        window.annullaFoto = () => {
-            document.getElementById('preview').classList.add('hidden');
-            document.getElementById('controls').classList.add('hidden');
-            document.getElementById('btn-scatta').classList.remove('hidden');
-            document.getElementById('status').innerText = "Pronto per lo scatto.";
-            fileTemporaneo = null;
+        window.confermaInvio = async () => {
+            const categoria = document.getElementById('catSelect').value;
+            // STRUTTURA DINAMICA: la cartella nello storage dipende dalla categoria
+            const storageRef = ref(storage, `posts/${categoria}/${Date.now()}_${fileTemporaneo.name}`);
+            
+            const snapshot = await uploadBytes(storageRef, fileTemporaneo);
+            const url = await getDownloadURL(snapshot.ref);
+
+            await addDoc(collection(db, "posts"), {
+                categoria: categoria,
+                titolo: document.getElementById('titolo').value,
+                descrizione: document.getElementById('descrizione').value,
+                prezzo: document.getElementById('prezzo').value,
+                valuta: document.getElementById('valuta').value,
+                urlFoto: url,
+                data: new Date().toISOString()
+            });
+            alert("Pubblicato!");
+            location.reload();
         };
 
-        window.confermaFoto = async () => {
-            if (!fileTemporaneo) return;
-            document.getElementById('status').innerText = "Caricamento in corso...";
-            document.getElementById('controls').classList.add('hidden');
-            try {
-                const storageRef = ref(storage, 'segnalazioni/' + Date.now() + '_' + fileTemporaneo.name);
-                const snapshot = await uploadBytes(storageRef, fileTemporaneo);
-                const url = await getDownloadURL(snapshot.ref);
-                await addDoc(collection(db, "posts"), { foto: url, data: new Date().toISOString(), stato: "nuovo" });
-                document.getElementById('status').innerText = "✅ Segnalazione inviata!";
-                setTimeout(() => { annullaFoto(); }, 2000);
-            } catch (error) {
-                document.getElementById('status').innerText = "❌ Errore durante l'invio.";
-                document.getElementById('btn-scatta').classList.remove('hidden');
-            }
-        };
+        window.annullaTutto = () => location.reload();
     </script>
 </body>
 </html>
