@@ -6,20 +6,13 @@
     <title>GeoLiA | Gestione</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { 
-            --blu: #3b5998; 
-            --giallo: #ffc107; 
-            --viola: #6f42c1; 
-            --bg: #f3f3f3; 
-        }
+        :root { --blu: #3b5998; --giallo: #ffc107; --viola: #6f42c1; --bg: #f3f3f3; }
         body { font-family: 'Segoe UI', system-ui; margin: 0; background: var(--bg); padding-bottom: 90px; }
         header { background: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--blu); }
         .fab { position: fixed; bottom: 80px; right: 20px; width: 60px; height: 60px; background: var(--viola); color: white; border-radius: 50%; border: none; font-size: 24px; box-shadow: 0 4px 10px rgba(111, 66, 193, 0.3); z-index: 100; }
-        
         .nav-bottom { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 10px 0; border-top: 2px solid var(--blu); z-index: 90; }
         .nav-item { text-decoration: none; color: var(--blu); text-align: center; flex: 1; font-size: 11px; cursor: pointer; }
         .nav-item i { display: block; font-size: 1.3rem; margin-bottom: 3px; }
-
         .modal { position: fixed; bottom: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; z-index: 500; align-items: flex-end; }
         .modal-content { background: white; width: 100%; max-width: 400px; margin: 0 auto; padding: 20px; border-radius: 20px 20px 0 0; max-height: 85vh; overflow-y: auto; border-top: 5px solid var(--giallo); }
         .form-input { width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
@@ -32,7 +25,6 @@
 
     <header><img src="logo.png" style="height:35px;"><i class="fa-solid fa-bell" style="color: var(--blu);"></i></header>
     <div id="feed" style="padding:15px;"><h3>Post Recenti</h3></div>
-
     <button class="fab" onclick="document.getElementById('modalForm').style.display='flex'">+</button>
 
     <nav class="nav-bottom">
@@ -56,7 +48,6 @@
                 <button class="btn-action" onclick="document.getElementById('cameraInput').click()">📸 Scatta Foto</button>
                 <button class="btn-action" onclick="document.getElementById('fileInput').click()">📁 Carica Galleria</button>
             </div>
-
             <div id="step2" class="hidden">
                 <img id="preview" style="width:100%; border-radius:10px; margin-bottom:10px; border: 2px solid var(--giallo);">
                 <input type="text" id="titolo" class="form-input" placeholder="Titolo">
@@ -76,4 +67,49 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
-        import { getFirestore,
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-storage.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyDAJIxBD8qGO6h8lAZeLnotm7GySpZrz_8", authDomain: "geolia-app.firebaseapp.com", projectId: "geolia-app", storageBucket: "geolia-app.firebasestorage.app", messagingSenderId: "341223455235", appId: "1:341223455235:web:6baa3fd3b9db6eaa22ec36", measurementId: "G-7SPH65RFH7" };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+        let fileTemporaneo = null;
+
+        window.gestisciFoto = (e) => {
+            fileTemporaneo = e.target.files[0];
+            if (!fileTemporaneo) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                document.getElementById('preview').src = ev.target.result;
+                document.getElementById('step1').classList.add('hidden');
+                document.getElementById('step2').classList.remove('hidden');
+            };
+            reader.readAsDataURL(fileTemporaneo);
+        };
+
+        window.confermaInvio = async () => {
+            if (!fileTemporaneo) return;
+            const categoria = document.getElementById('catSelect').value;
+            try {
+                const storageRef = ref(storage, categoria + '/' + Date.now() + '_' + fileTemporaneo.name);
+                const snapshot = await uploadBytes(storageRef, fileTemporaneo);
+                const url = await getDownloadURL(snapshot.ref);
+                await addDoc(collection(db, "posts"), {
+                    categoria: categoria,
+                    titolo: document.getElementById('titolo').value,
+                    descrizione: document.getElementById('descrizione').value,
+                    prezzo: document.getElementById('prezzo').value,
+                    valuta: document.getElementById('valuta').value,
+                    foto: url,
+                    data: new Date().toISOString()
+                });
+                alert("Pubblicato con successo in: " + categoria.toUpperCase());
+                location.reload();
+            } catch (error) {
+                alert("Errore caricamento: " + error.message);
+            }
+        };
+    </script>
+</body>
+</html>
