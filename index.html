@@ -11,6 +11,11 @@
         header { background: var(--primary); padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
         .fab { position: fixed; bottom: 80px; right: 20px; width: 60px; height: 60px; background: var(--accent); color: white; border-radius: 50%; border: none; font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 100; }
         
+        /* Barra Navigazione Inferiore (Ripristinata) */
+        .nav-bottom { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #ddd; z-index: 90; }
+        .nav-item { text-decoration: none; color: #555; text-align: center; flex: 1; font-size: 11px; cursor: pointer; }
+        .nav-item i { display: block; font-size: 1.3rem; margin-bottom: 3px; }
+
         /* Modale */
         .modal { position: fixed; bottom: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; z-index: 500; align-items: flex-end; }
         .modal-content { background: white; width: 100%; max-width: 400px; margin: 0 auto; padding: 20px; border-radius: 20px 20px 0 0; max-height: 85vh; overflow-y: auto; }
@@ -22,9 +27,17 @@
 <body>
 
     <header><img src="logo.png" style="height:35px;"><i class="fa-solid fa-bell"></i></header>
-    <div id="feed"><h3>Post Recenti</h3></div>
+    <div id="feed" style="padding:15px;"><h3>Post Recenti</h3></div>
 
     <button class="fab" onclick="document.getElementById('modalForm').style.display='flex'">+</button>
+
+    <nav class="nav-bottom">
+        <a class="nav-item"><i class="fa-solid fa-house"></i>Home</a>
+        <a class="nav-item"><i class="fa-solid fa-filter"></i>Filtri</a>
+        <a class="nav-item"><i class="fa-solid fa-map-marked-alt"></i>Mappa</a>
+        <a class="nav-item"><i class="fa-solid fa-user"></i>Profilo</a>
+        <a class="nav-item"><i class="fa-solid fa-chart-line"></i>Admin</a>
+    </nav>
 
     <div id="modalForm" class="modal">
         <div class="modal-content">
@@ -42,7 +55,6 @@
 
             <div id="step2" class="hidden">
                 <img id="preview" style="width:100%; border-radius:10px; margin-bottom:10px;">
-                <p id="status-msg">Anteprima caricata.</p>
                 <input type="text" id="titolo" class="form-input" placeholder="Titolo">
                 <textarea id="descrizione" class="form-input" placeholder="Descrizione"></textarea>
                 <div style="display:flex; gap:5px;">
@@ -90,9 +102,7 @@
 
         window.confermaInvio = async () => {
             if (!fileTemporaneo) return;
-            document.getElementById('status-msg').innerText = "Caricamento...";
             try {
-                // Logica esatta del secondo codice che invia correttamente su storage
                 const storageRef = ref(storage, 'segnalazioni/' + Date.now() + '_' + fileTemporaneo.name);
                 const snapshot = await uploadBytes(storageRef, fileTemporaneo);
                 const url = await getDownloadURL(snapshot.ref);
@@ -106,10 +116,10 @@
                     foto: url,
                     data: new Date().toISOString()
                 });
-                alert("Pubblicato!");
+                alert("Pubblicato con successo!");
                 location.reload();
             } catch (error) {
-                alert("Errore: " + error.message);
+                alert("Errore caricamento: " + error.message);
             }
         };
     </script>
