@@ -1,21 +1,85 @@
-<header>
-    <img src="logo.png" alt="Logo">
-</header>
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GeoLiA | Profilo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --blu: #3b5998; --giallo: #ffc107; --viola: #6f42c1; --bg: #f3f3f3; }
+        body { font-family: 'Segoe UI', system-ui; margin: 0; background: var(--bg); padding-bottom: 90px; }
+        header { background: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--blu); }
+        .nav-bottom { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 10px 0; border-top: 2px solid var(--blu); z-index: 90; }
+        .nav-item { text-decoration: none; color: var(--blu); text-align: center; flex: 1; font-size: 11px; cursor: pointer; }
+        .nav-item i { display: block; font-size: 1.3rem; margin-bottom: 3px; }
+        .box-centrale { max-width: 400px; margin: 20px auto; padding: 20px; background: white; border-radius: 15px; border-top: 5px solid var(--giallo); }
+        .form-input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .btn-action { padding: 12px; border: none; border-radius: 8px; background: var(--blu); color: white; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
+        .link-switch { display: block; margin-top: 15px; color: var(--viola); cursor: pointer; font-size: 14px; text-align: center; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
 
-<main id="container-modulo">
-    <div id="vista-login">
-        <h3>Accedi con il tuo PIN</h3>
-        <input type="password" id="pin-login" placeholder="Inserisci il tuo PIN">
-        <button onclick="eseguiAccesso()">Entra</button>
-        <p onclick="mostraRegistrazione()">Non hai un account? Registrati qui</p>
+    <header><img src="logo.png" style="height:35px;"><i class="fa-solid fa-user-circle" style="color: var(--blu);"></i></header>
+
+    <div class="box-centrale">
+        <!-- ACCEDI -->
+        <div id="div-login">
+            <h3 style="color:var(--blu)">Accedi</h3>
+            <input type="password" id="login-pin" class="form-input" placeholder="Il tuo PIN">
+            <button class="btn-action" onclick="eseguiAccesso()">Entra</button>
+            <span class="link-switch" onclick="toggleForm()">Non hai un profilo? Registrati</span>
+        </div>
+
+        <!-- REGISTRAZIONE -->
+        <div id="div-registra" class="hidden">
+            <h3 style="color:var(--viola)">Registrazione</h3>
+            <input type="text" id="reg-nome" class="form-input" placeholder="Nome Attività">
+            <input type="text" id="reg-tel" class="form-input" placeholder="Telefono">
+            <input type="password" id="reg-pin" class="form-input" placeholder="Crea un PIN">
+            <button class="btn-action" style="background:var(--viola)" onclick="eseguiRegistrazione()">Crea Profilo</button>
+            <span class="link-switch" onclick="toggleForm()">Hai già un profilo? Accedi</span>
+        </div>
     </div>
 
-    <div id="vista-registrazione" style="display:none;">
-        <h3>Registrazione Nuova Attività</h3>
-        <input type="text" id="nome" placeholder="Nome Attività">
-        <input type="text" id="telefono" placeholder="Telefono">
-        <input type="password" id="pin-nuovo" placeholder="Crea un PIN">
-        <button onclick="eseguiRegistrazione()">Crea Account</button>
-        <p onclick="mostraLogin()">Hai già un account? Accedi</p>
-    </div>
-</main>
+    <nav class="nav-bottom">
+        <a href="index.html" class="nav-item"><i class="fa-solid fa-house"></i>Home</a>
+        <a class="nav-item"><i class="fa-solid fa-filter"></i>Filtri</a>
+        <a class="nav-item"><i class="fa-solid fa-map-marked-alt"></i>Mappa</a>
+        <a href="users.html" class="nav-item" style="color:var(--viola)"><i class="fa-solid fa-user"></i>Profilo</a>
+        <a class="nav-item"><i class="fa-solid fa-chart-line"></i>Admin</a>
+    </nav>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+
+        const firebaseConfig = { /* usa lo stesso del tuo index */ };
+        const db = getFirestore(initializeApp(firebaseConfig));
+
+        window.toggleForm = () => {
+            document.getElementById('div-login').classList.toggle('hidden');
+            document.getElementById('div-registra').classList.toggle('hidden');
+        };
+
+        window.eseguiRegistrazione = async () => {
+            const nome = document.getElementById('reg-nome').value;
+            const tel = document.getElementById('reg-tel').value;
+            const pin = document.getElementById('reg-pin').value;
+            const slug = "ch-ti-" + nome.toLowerCase().replace(/ /g, '-');
+            
+            try {
+                await setDoc(doc(db, "users", slug), {
+                    nome_attivita: nome,
+                    telefono: tel,
+                    pin: pin,
+                    ruolo: "utente",
+                    url_pagina: slug
+                });
+                alert("Registrato! Il tuo ID è: " + slug);
+            } catch (e) { alert("Errore: " + e.message); }
+        };
+    </script>
+</body>
+</html>
