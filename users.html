@@ -24,38 +24,36 @@
     <header><img src="logo.png" style="height:35px;"><i class="fa-solid fa-user-circle" style="color: var(--blu);"></i></header>
 
     <div class="box-centrale">
-        <!-- ACCEDI -->
         <div id="div-login">
             <h3 style="color:var(--blu)">Accedi</h3>
-            <input type="password" id="login-pin" class="form-input" placeholder="Il tuo PIN">
+            <input type="password" id="login-pin" class="form-input" placeholder="Inserisci il tuo PIN">
             <button class="btn-action" onclick="eseguiAccesso()">Entra</button>
-            <span class="link-switch" onclick="toggleForm()">Non hai un profilo? Registrati</span>
+            <span class="link-switch" onclick="toggleForm()">Non sei registrato? Registrati qui</span>
         </div>
 
-        <!-- REGISTRAZIONE -->
         <div id="div-registra" class="hidden">
             <h3 style="color:var(--viola)">Registrazione</h3>
             <input type="text" id="reg-nome" class="form-input" placeholder="Nome Attività">
             <input type="text" id="reg-tel" class="form-input" placeholder="Telefono">
             <input type="password" id="reg-pin" class="form-input" placeholder="Crea un PIN">
-            <button class="btn-action" style="background:var(--viola)" onclick="eseguiRegistrazione()">Crea Profilo</button>
-            <span class="link-switch" onclick="toggleForm()">Hai già un profilo? Accedi</span>
+            <button class="btn-action" style="background:var(--viola)" onclick="eseguiRegistrazione()">Crea Account</button>
+            <span class="link-switch" onclick="toggleForm()">Hai già un account? Accedi</span>
         </div>
     </div>
 
     <nav class="nav-bottom">
         <a href="index.html" class="nav-item"><i class="fa-solid fa-house"></i>Home</a>
-        <a class="nav-item"><i class="fa-solid fa-filter"></i>Filtri</a>
-        <a class="nav-item"><i class="fa-solid fa-map-marked-alt"></i>Mappa</a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-filter"></i>Filtri</a>
+        <a href="maps.html" class="nav-item"><i class="fa-solid fa-map-marked-alt"></i>Mappa</a>
         <a href="users.html" class="nav-item" style="color:var(--viola)"><i class="fa-solid fa-user"></i>Profilo</a>
-        <a class="nav-item"><i class="fa-solid fa-chart-line"></i>Admin</a>
+        <a href="admin.html" class="nav-item"><i class="fa-solid fa-chart-line"></i>Admin</a>
     </nav>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
-        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
 
-        const firebaseConfig = { /* usa lo stesso del tuo index */ };
+        const firebaseConfig = { apiKey: "AIzaSyDAJIxBD8qGO6h8lAZeLnotm7GySpZrz_8", authDomain: "geolia-app.firebaseapp.com", projectId: "geolia-app", storageBucket: "geolia-app.firebasestorage.app", messagingSenderId: "341223455235", appId: "1:341223455235:web:6baa3fd3b9db6eaa22ec36", measurementId: "G-7SPH65RFH7" };
         const db = getFirestore(initializeApp(firebaseConfig));
 
         window.toggleForm = () => {
@@ -77,8 +75,14 @@
                     ruolo: "utente",
                     url_pagina: slug
                 });
-                alert("Registrato! Il tuo ID è: " + slug);
+                alert("Registrato correttamente!");
+                window.location.href = "/" + slug;
             } catch (e) { alert("Errore: " + e.message); }
+        };
+
+        window.eseguiAccesso = () => {
+            const pin = document.getElementById('login-pin').value;
+            alert("Controllo PIN: " + pin + " (Logica di verifica da collegare a DB)");
         };
     </script>
 </body>
