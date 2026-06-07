@@ -3,65 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Geolia | Gestione</title>
+    <title>Geolia | Gestione Integrata</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --primary: #ffffff; --accent: #2ecc71; --bg: #f3f3f3; }
-        body { font-family: 'Segoe UI', system-ui; margin: 0; background: var(--bg); padding-bottom: 90px; }
+        :root { --primary: #ffffff; --text: #131921; --accent: #2ecc71; --bg: #f3f3f3; }
+        body { font-family: 'Segoe UI', system-ui; margin: 0; background: var(--bg); padding-bottom: 90px; color: var(--text); }
         
-        header { background: var(--primary); padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
+        header { background: var(--primary); padding: 10px 15px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #ddd; }
+        .logo-img { height: 35px; width: auto; }
+        
+        .main-layout { padding: 15px; }
+        .card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #ddd; }
+        
+        /* FAB e Modal */
         .fab { position: fixed; bottom: 80px; right: 20px; width: 60px; height: 60px; background: var(--accent); color: white; border-radius: 50%; border: none; font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 100; }
+        .modal { position: fixed; bottom: 0; width: 100%; background: white; padding: 20px; border-radius: 20px 20px 0 0; display: none; z-index: 200; box-shadow: 0 -5px 20px rgba(0,0,0,0.2); }
+        .grid-select { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .btn-select { padding: 15px; background: #f8f8f8; border: 1px solid #ddd; border-radius: 10px; font-weight: bold; cursor: pointer; }
         
-        /* Menu in basso fisso */
         .nav-bottom { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #ddd; z-index: 90; }
         .nav-item { text-decoration: none; color: #555; text-align: center; flex: 1; font-size: 11px; }
         .nav-item i { display: block; font-size: 1.3rem; margin-bottom: 3px; }
-
-        /* Modale */
-        .modal { position: fixed; bottom: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; z-index: 500; align-items: flex-end; }
-        .modal-content { background: white; width: 100%; max-width: 400px; margin: 0 auto; padding: 20px; border-radius: 20px 20px 0 0; max-height: 85vh; overflow-y: auto; }
-        .form-input { width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        .btn-action { padding: 12px; border: none; border-radius: 8px; background: #eee; cursor: pointer; font-weight: bold; width: 100%; margin: 5px 0; }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <header><img src="logo.png" style="height:35px;"><i class="fa-solid fa-bell"></i></header>
-    <div class="main-layout" id="feed"><h3>Post Recenti</h3></div>
+    <header>
+        <img src="logo.png" class="logo-img">
+        <i class="fa-solid fa-bell"></i>
+    </header>
 
-    <button class="fab" onclick="document.getElementById('modalForm').style.display='flex'">+</button>
-
-    <div id="modalForm" class="modal">
-        <div class="modal-content">
-            <div id="step1">
-                <h3>Cosa pubblichi?</h3>
-                <select id="catSelect" class="form-input">
-                    <option value="offerte">🏷️ Offerte</option>
-                    <option value="menu">🍽️ Menu</option>
-                    <option value="marketplace">📦 Marketplace</option>
-                    <option value="guasto">🛠️ Guasto</option>
-                </select>
-                <button class="btn-action" onclick="document.getElementById('cameraInput').click()">📸 Scatta Foto</button>
-                <button class="btn-action" onclick="document.getElementById('fileInput').click()">📁 Carica Galleria</button>
-            </div>
-
-            <div id="step2" class="hidden">
-                <img id="preview" style="width:100%; border-radius:10px; margin-bottom:10px;">
-                <input type="text" id="titolo" class="form-input" placeholder="Titolo">
-                <textarea id="descrizione" class="form-input" placeholder="Descrizione"></textarea>
-                <div style="display:flex; gap:5px;">
-                    <input type="number" id="prezzo" class="form-input" placeholder="Prezzo">
-                    <select id="valuta" class="form-input" style="width:auto;"><option>CHF</option><option>EUR</option></select>
-                </div>
-                <button class="btn-action" style="background:var(--accent); color:white;" onclick="eseguiUpload()">✅ Pubblica</button>
-                <button class="btn-action" onclick="location.reload()">❌ Annulla</button>
-            </div>
+    <div class="main-layout" id="feed">
+        <h3>Post Recenti</h3>
         </div>
+
+    <button class="fab" onclick="document.getElementById('modalSelezione').style.display='block'">+</button>
+
+    <div id="modalSelezione" class="modal">
+        <h3>Cosa pubblichi?</h3>
+        <div class="grid-select">
+            <button class="btn-select" onclick="avviaCamera('offerte')">🏷️ Offerte</button>
+            <button class="btn-select" onclick="avviaCamera('menu')">🍽️ Menu</button>
+            <button class="btn-select" onclick="avviaCamera('marketplace')">📦 Vendi</button>
+            <button class="btn-select" onclick="avviaCamera('guasto')">🛠️ Guasto</button>
+        </div>
+        <button style="width:100%; margin-top:15px; padding:10px; border:none;" onclick="this.parentElement.style.display='none'">Chiudi</button>
     </div>
 
-    <input type="file" id="cameraInput" class="hidden" accept="image/*" capture="environment" onchange="mostraAnteprima(event)">
-    <input type="file" id="fileInput" class="hidden" accept="image/*" onchange="mostraAnteprima(event)">
+    <input type="file" id="cameraInput" accept="image/*" capture="environment" class="hidden" onchange="confermaPubblicazione(event)">
 
     <nav class="nav-bottom">
         <a class="nav-item"><i class="fa-solid fa-house"></i>Home</a>
@@ -73,50 +63,45 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
-        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-storage.js";
 
-        const firebaseConfig = { /* INSERISCI CONFIGURAZIONE */ };
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const storage = getStorage(app);
+        const db = getFirestore(initializeApp({ /* Configurazione */ }));
+        const storage = getStorage();
         
-        let fileDaCaricare = null;
-
-        window.mostraAnteprima = (e) => {
-            fileDaCaricare = e.target.files[0];
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-                document.getElementById('preview').src = ev.target.result;
-                document.getElementById('step1').classList.add('hidden');
-                document.getElementById('step2').classList.remove('hidden');
-            };
-            reader.readAsDataURL(fileDaCaricare);
+        let tipoPost = "";
+        
+        window.avviaCamera = (tipo) => {
+            tipoPost = tipo;
+            document.getElementById('modalSelezione').style.display = 'none';
+            document.getElementById('cameraInput').click();
         };
 
-        window.eseguiUpload = async () => {
-            if (!fileDaCaricare) return;
-            
-            try {
-                const storageRef = ref(storage, 'posts/' + Date.now());
-                const snapshot = await uploadBytes(storageRef, fileDaCaricare);
-                const url = await getDownloadURL(snapshot.ref);
+        window.confermaPubblicazione = async (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
 
-                await addDoc(collection(db, "posts"), {
-                    tipo: document.getElementById('catSelect').value,
-                    titolo: document.getElementById('titolo').value,
-                    descrizione: document.getElementById('descrizione').value,
-                    prezzo: document.getElementById('prezzo').value,
-                    valuta: document.getElementById('valuta').value,
-                    foto: url,
-                    data: new Date().toISOString()
-                });
-                
-                alert("Pubblicato con successo!");
-                location.reload();
-            } catch (err) {
-                alert("Errore caricamento: " + err.message);
-            }
+            // 1. Carica su Storage
+            const storageRef = ref(storage, 'posts/' + Date.now());
+            const snapshot = await uploadBytes(storageRef, file);
+            const url = await getDownloadURL(snapshot.ref);
+
+            // 2. Salva in Posts (con riferimento all'autore)
+            const postRef = await addDoc(collection(db, "posts"), {
+                tipo: tipoPost,
+                foto: url,
+                autoreId: "utente_test", // Da sostituire col login
+                data: new Date().toISOString()
+            });
+
+            // 3. Salva riferimento in User (per il profilo)
+            await setDoc(doc(db, "users", "utente_test", "iMieiPost", postRef.id), {
+                postId: postRef.id,
+                tipo: tipoPost,
+                data: new Date().toISOString()
+            });
+
+            alert("Pubblicato con successo!");
         };
     </script>
 </body>
