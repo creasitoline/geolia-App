@@ -72,16 +72,51 @@
     </nav>
 
     <script type="module">
-        // ... (Logica Firebase uguale alla precedente) ...
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-storage.js";
+
+        const firebaseConfig = { /* INSERISCI CONFIGURAZIONE */ };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+        
+        let fileDaCaricare = null;
+
         window.mostraAnteprima = (e) => {
-            const file = e.target.files[0];
+            fileDaCaricare = e.target.files[0];
             const reader = new FileReader();
             reader.onload = (ev) => {
                 document.getElementById('preview').src = ev.target.result;
                 document.getElementById('step1').classList.add('hidden');
                 document.getElementById('step2').classList.remove('hidden');
             };
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(fileDaCaricare);
+        };
+
+        window.eseguiUpload = async () => {
+            if (!fileDaCaricare) return;
+            
+            try {
+                const storageRef = ref(storage, 'posts/' + Date.now());
+                const snapshot = await uploadBytes(storageRef, fileDaCaricare);
+                const url = await getDownloadURL(snapshot.ref);
+
+                await addDoc(collection(db, "posts"), {
+                    tipo: document.getElementById('catSelect').value,
+                    titolo: document.getElementById('titolo').value,
+                    descrizione: document.getElementById('descrizione').value,
+                    prezzo: document.getElementById('prezzo').value,
+                    valuta: document.getElementById('valuta').value,
+                    foto: url,
+                    data: new Date().toISOString()
+                });
+                
+                alert("Pubblicato con successo!");
+                location.reload();
+            } catch (err) {
+                alert("Errore caricamento: " + err.message);
+            }
         };
     </script>
 </body>
