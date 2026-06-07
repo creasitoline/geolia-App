@@ -1,38 +1,125 @@
-<style>
-    /* Popup centrato e adattabile */
-    .modal { position: fixed; bottom: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; z-index: 500; align-items: flex-end; }
-    .modal-content { background: white; width: 90%; max-width: 400px; margin: 0 auto 20px auto; padding: 20px; border-radius: 20px; max-height: 80vh; overflow-y: auto; }
-    
-    .form-group { margin-bottom: 15px; }
-    input, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-</style>
-
-<!-- MODAL UNICO -->
-<div id="modalForm" class="modal">
-    <div class="modal-content">
-        <h3>Nuovo Post</h3>
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Geolia | Gestione Integrata</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary: #ffffff; --text: #131921; --accent: #2ecc71; --bg: #f3f3f3; }
+        body { font-family: 'Segoe UI', system-ui; margin: 0; background: var(--bg); padding-bottom: 90px; color: var(--text); }
         
-        <!-- Selezione Categoria -->
-        <select id="catSelect" onchange="toggleFields()">
-            <option value="offerte">🏷️ Offerte</option>
-            <option value="menu">🍽️ Menu del giorno</option>
-            <option value="marketplace">📦 Marketplace</option>
-            <option value="guasto">🛠️ Segnala Guasto</option>
-        </select>
-
-        <hr>
+        header { background: var(--primary); padding: 10px 15px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #ddd; }
+        .logo-img { height: 35px; width: auto; }
         
-        <!-- Anteprima Foto -->
-        <img id="preview" style="width:100%; display:none; border-radius:10px; margin: 10px 0;">
-        <button id="btnCamera" onclick="document.getElementById('fileInput').click()">📸 Scatta/Carica Foto</button>
-        <input type="file" id="fileInput" class="hidden" accept="image/*" onchange="anteprimaFoto(event)">
+        .main-layout { padding: 15px; }
+        .fab { position: fixed; bottom: 80px; right: 20px; width: 60px; height: 60px; background: var(--accent); color: white; border-radius: 50%; border: none; font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 100; }
+        
+        /* Modal Style */
+        .modal { position: fixed; bottom: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; z-index: 500; align-items: flex-end; }
+        .modal-content { background: white; width: 90%; max-width: 400px; margin: 0 auto 20px auto; padding: 20px; border-radius: 20px; max-height: 80vh; overflow-y: auto; }
+        .grid-select { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
+        .btn-select { padding: 15px; background: #f8f8f8; border: 1px solid #ddd; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        
+        .form-group { margin-bottom: 15px; }
+        input, textarea, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        
+        .nav-bottom { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #ddd; z-index: 90; }
+        .nav-item { text-decoration: none; color: #555; text-align: center; flex: 1; font-size: 11px; cursor: pointer; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
 
-        <!-- Campi Modulo -->
-        <div class="form-group"><input type="text" id="titolo" placeholder="Titolo"></div>
-        <div class="form-group"><textarea id="descrizione" placeholder="Descrizione"></textarea></div>
-        <div class="form-group" id="divPrezzo"><input type="number" id="prezzo" placeholder="Prezzo (€)"></div>
+    <header>
+        <img src="logo.png" class="logo-img">
+        <i class="fa-solid fa-bell"></i>
+    </header>
 
-        <button onclick="pubblicaPost()" style="width:100%; padding:15px; background:var(--accent); color:white; border:none; border-radius:10px;">Pubblica</button>
-        <button onclick="document.getElementById('modalForm').style.display='none'" style="width:100%; margin-top:10px; background:none; border:none;">Annulla</button>
+    <div class="main-layout" id="feed"><h3>Post Recenti</h3></div>
+
+    <button class="fab" onclick="document.getElementById('modalSelezione').style.display='flex'">+</button>
+
+    <div id="modalSelezione" class="modal">
+        <div class="modal-content">
+            <h3>Cosa pubblichi?</h3>
+            <select id="catSelect" class="form-group">
+                <option value="offerte">🏷️ Offerte</option>
+                <option value="menu">🍽️ Menu del giorno</option>
+                <option value="marketplace">📦 Marketplace</option>
+                <option value="guasto">🛠️ Segnala Guasto</option>
+            </select>
+            
+            <img id="preview" style="width:100%; display:none; border-radius:10px; margin: 10px 0;">
+            <button id="btnCamera" style="width:100%; padding:10px;" onclick="document.getElementById('fileInput').click()">📸 Carica Foto</button>
+            <input type="file" id="fileInput" class="hidden" accept="image/*" onchange="anteprimaFoto(event)">
+
+            <div class="form-group"><input type="text" id="titolo" placeholder="Titolo"></div>
+            <div class="form-group"><textarea id="descrizione" placeholder="Descrizione"></textarea></div>
+            <div class="form-group"><input type="number" id="prezzo" placeholder="Prezzo (€)"></div>
+
+            <button onclick="pubblicaPost()" style="width:100%; padding:15px; background:var(--accent); color:white; border:none; border-radius:10px;">Pubblica</button>
+        </div>
     </div>
-</div>
+
+    <nav class="nav-bottom">
+        <a class="nav-item"><i class="fa-solid fa-house"></i>Home</a>
+        <a class="nav-item"><i class="fa-solid fa-filter"></i>Filtri</a>
+        <a class="nav-item"><i class="fa-solid fa-map"></i>Mappa</a>
+        <a class="nav-item"><i class="fa-solid fa-user"></i>Profilo</a>
+    </nav>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-storage.js";
+
+        // INSERISCI QUI LA TUA CONFIGURAZIONE FIREBASE
+        const firebaseConfig = {
+            apiKey: "...", authDomain: "...", projectId: "...", storageBucket: "...",
+            messagingSenderId: "...", appId: "..."
+        };
+        const db = getFirestore(initializeApp(firebaseConfig));
+        const storage = getStorage();
+        
+        let fileTemporaneo = null;
+
+        window.anteprimaFoto = (e) => {
+            fileTemporaneo = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                const img = document.getElementById('preview');
+                img.src = ev.target.result;
+                img.style.display = 'block';
+            };
+            reader.readAsDataURL(fileTemporaneo);
+        };
+
+        window.pubblicaPost = async () => {
+            if (!fileTemporaneo) return alert("Scatta una foto!");
+            
+            const storageRef = ref(storage, 'posts/' + Date.now());
+            const snapshot = await uploadBytes(storageRef, fileTemporaneo);
+            const url = await getDownloadURL(snapshot.ref);
+
+            const postRef = await addDoc(collection(db, "posts"), {
+                tipo: document.getElementById('catSelect').value,
+                titolo: document.getElementById('titolo').value,
+                descrizione: document.getElementById('descrizione').value,
+                prezzo: document.getElementById('prezzo').value,
+                foto: url,
+                autoreId: "utente_test",
+                data: new Date().toISOString()
+            });
+
+            await setDoc(doc(db, "users", "utente_test", "iMieiPost", postRef.id), {
+                postId: postRef.id,
+                tipo: document.getElementById('catSelect').value
+            });
+
+            alert("Pubblicato!");
+            document.getElementById('modalSelezione').style.display = 'none';
+        };
+    </script>
+</body>
+</html>
