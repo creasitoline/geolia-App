@@ -24,15 +24,15 @@
 <body>
 
     <header><img src="logo.png" style="height:35px;"><i class="fa-solid fa-bell" style="color: var(--blu);"></i></header>
-    <div id="feed" style="padding:15px;"><h3 id="titolo-sezione">Caricamento in corso...</h3></div>
+    <div id="feed" style="padding:15px;"><h3>Post Recenti</h3></div>
     <button class="fab" onclick="document.getElementById('modalForm').style.display='flex'">+</button>
 
     <nav class="nav-bottom">
-        <a href="index.html" class="nav-item"><i class="fa-solid fa-house"></i>Home</a>
-        <a href="#" class="nav-item"><i class="fa-solid fa-filter"></i>Filtri</a>
-        <a href="maps.html" class="nav-item"><i class="fa-solid fa-map-marked-alt"></i>Mappa</a>
-        <a href="users.html" class="nav-item"><i class="fa-solid fa-user"></i>Profilo</a>
-        <a href="admin.html" class="nav-item"><i class="fa-solid fa-chart-line"></i>Admin</a>
+        <a class="nav-item"><i class="fa-solid fa-house"></i>Home</a>
+        <a class="nav-item"><i class="fa-solid fa-filter"></i>Filtri</a>
+        <a class="nav-item"><i class="fa-solid fa-map-marked-alt"></i>Mappa</a>
+        <a class="nav-item"><i class="fa-solid fa-user"></i>Profilo</a>
+        <a class="nav-item"><i class="fa-solid fa-chart-line"></i>Admin</a>
     </nav>
 
     <div id="modalForm" class="modal">
@@ -67,49 +67,69 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, doc, getDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+        import { getFirestore, collection, doc, setDoc, getDocs, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-storage.js";
 
         const firebaseConfig = { apiKey: "AIzaSyDAJIxBD8qGO6h8lAZeLnotm7GySpZrz_8", authDomain: "geolia-app.firebaseapp.com", projectId: "geolia-app", storageBucket: "geolia-app.firebasestorage.app", messagingSenderId: "341223455235", appId: "1:341223455235:web:6baa3fd3b9db6eaa22ec36", measurementId: "G-7SPH65RFH7" };
-        const db = getFirestore(initializeApp(firebaseConfig));
-        const storage = getStorage(initializeApp(firebaseConfig));
-
-        // Rilevamento utente dall'URL
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+        
+        let fileTemporaneo = null;
         const params = new URLSearchParams(window.location.search);
-        const userId = params.get('user');
+        const userId = params.get('user') || "pubblico"; // Se non c'è user, salva come pubblico
 
-        async function initPage() {
-            if (userId) {
-                const userDoc = await getDoc(doc(db, "users", userId));
-                if (userDoc.exists()) {
-                    document.getElementById('titolo-sezione').innerText = "Profilo: " + userDoc.data().nome_attivita;
-                    caricaPostUtente(userId);
-                }
-            } else {
-                document.getElementById('titolo-sezione').innerText = "Post Recenti";
+        window.gestisciFoto = (e) => {
+            fileTemporaneo = e.target.files[0];
+            if (!fileTemporaneo) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                document.getElementById('preview').src = ev.target.result;
+                document.getElementById('step1').classList.add('hidden');
+                document.getElementById('step2').classList.remove('hidden');
+            };
+            reader.readAsDataURL(fileTemporaneo);
+        };
+
+        async function generaIdPost() {
+            const q = query(collection(db, "posts"), where("autore", "==", userId), orderBy("codice", "desc"), limit(1));
+            const snapshot = await getDocs(q);
+            let nuovoNumero = 1;
+            if (!snapshot.empty) {
+                const ultimoPost = snapshot.docs[0].data();
+                nuovoNumero = parseInt(ultimoPost.codice.replace('sg', '')) + 1;
             }
-        }
-
-        async function caricaPostUtente(id) {
-            const q = query(collection(db, "posts"), where("autore", "==", id));
-            const querySnapshot = await getDocs(q);
-            // Qui aggiungeremo il ciclo per visualizzare i post
+            return "sg" + nuovoNumero.toString().padStart(3, '0');
         }
 
         window.confermaInvio = async () => {
+            if (!fileTemporaneo) return;
             const categoria = document.getElementById('catSelect').value;
-            // Aggiungiamo l'ID utente al post per poterlo filtrare in futuro
-            await addDoc(collection(db, "posts"), {
-                autore: userId || "pubblico",
-                categoria: categoria,
-                titolo: document.getElementById('titolo').value,
-                descrizione: document.getElementById('descrizione').value,
-                data: new Date().toISOString()
-            });
-            alert("Pubblicato!");
+            const codice = await generaIdPost();
+            
+            try {
+                const storageRef = ref(storage, userId + '/' + codice + '_' + fileTemporaneo.name);
+                const snapshot = await uploadBytes(storageRef, fileTemporaneo);
+                const url = await getDownloadURL(snapshot.ref);
+                
+                // Salviamo usando il formato: userId_codice (es: bar-tropeano_sg001)
+                await setDoc(doc(db, "posts", userId + "_" + codice), {
+                    autore: userId,
+                    codice: codice,
+                    categoria: categoria,
+                    titolo: document.getElementById('titolo').value,
+                    descrizione: document.getElementById('descrizione').value,
+                    prezzo: document.getElementById('prezzo').value,
+                    valuta: document.getElementById('valuta').value,
+                    foto: url,
+                    data: new Date().toISOString()
+                });
+                alert("Pubblicato! Il link del post è: post.html?id=" + userId + "_" + codice);
+                location.reload();
+            } catch (error) {
+                alert("Errore caricamento: " + error.message);
+            }
         };
-
-        initPage();
     </script>
 </body>
 </html>
