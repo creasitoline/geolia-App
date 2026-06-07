@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dettaglio Prodotto</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --blu: #3b5998; --giallo: #ffc107; --viola: #6f42c1; --bg: #f3f3f3; }
+        body { font-family: 'Segoe UI', system-ui; margin: 0; background: var(--bg); padding: 20px; }
+        .card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 400px; margin: 0 auto; }
+        #foto-post { width: 100%; border-radius: 10px; margin-bottom: 15px; }
+        .prezzo { font-size: 1.5rem; font-weight: bold; color: var(--viola); margin: 10px 0; }
+        .btn-wa { display: block; background: #25d366; color: white; text-align: center; padding: 15px; border-radius: 10px; text-decoration: none; font-weight: bold; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <img id="foto-post" src="" alt="Prodotto">
+        <h1 id="titolo-post">Caricamento...</h1>
+        <p id="descrizione-post"></p>
+        <div class="prezzo" id="prezzo-post"></div>
+        <a id="btn-wa" href="#" class="btn-wa" target="_blank"><i class="fa-brands fa-whatsapp"></i> Prenota su WhatsApp</a>
+        <button class="btn-action" style="margin-top:10px; background:transparent; border:none; color:grey;" onclick="history.back()">Indietro</button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyDAJIxBD8qGO6h8lAZeLnotm7GySpZrz_8", authDomain: "geolia-app.firebaseapp.com", projectId: "geolia-app", storageBucket: "geolia-app.firebasestorage.app", messagingSenderId: "341223455235", appId: "1:341223455235:web:6baa3fd3b9db6eaa22ec36", measurementId: "G-7SPH65RFH7" };
+        const db = getFirestore(initializeApp(firebaseConfig));
+
+        async function caricaDettaglio() {
+            const params = new URLSearchParams(window.location.search);
+            const postId = params.get('id'); // Esempio: sg001
+
+            if (!postId) return alert("Prodotto non trovato");
+
+            const docSnap = await getDoc(doc(db, "posts", postId));
+            if (docSnap.exists()) {
+                const p = docSnap.data();
+                document.getElementById('titolo-post').innerText = p.titolo;
+                document.getElementById('descrizione-post').innerText = p.descrizione;
+                document.getElementById('prezzo-post').innerText = p.prezzo + " " + p.valuta;
+                document.getElementById('foto-post').src = p.foto;
+                
+                // Configura link WhatsApp (Assumiamo che nel post ci sia il telefono dell'esercente)
+                const tel = p.telefono || "41791234567"; // Default se manca
+                const testo = `Ciao, vorrei prenotare: ${p.titolo} al prezzo di ${p.prezzo} ${p.valuta}`;
+                document.getElementById('btn-wa').href = `https://wa.me/${tel}?text=${encodeURIComponent(testo)}`;
+            }
+        }
+        caricaDettaglio();
+    </script>
+</body>
+</html>
