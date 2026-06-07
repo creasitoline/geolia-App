@@ -51,7 +51,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
-        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyDAJIxBD8qGO6h8lAZeLnotm7GySpZrz_8", authDomain: "geolia-app.firebaseapp.com", projectId: "geolia-app", storageBucket: "geolia-app.firebasestorage.app", messagingSenderId: "341223455235", appId: "1:341223455235:web:6baa3fd3b9db6eaa22ec36", measurementId: "G-7SPH65RFH7" };
         const db = getFirestore(initializeApp(firebaseConfig));
@@ -80,9 +80,23 @@
             } catch (e) { alert("Errore: " + e.message); }
         };
 
-        window.eseguiAccesso = () => {
-            const pin = document.getElementById('login-pin').value;
-            alert("Controllo PIN: " + pin + " (Logica di verifica da collegare a DB)");
+        window.eseguiAccesso = async () => {
+            const pinInserito = document.getElementById('login-pin').value;
+            if (!pinInserito) return alert("Inserisci il PIN");
+
+            try {
+                const q = query(collection(db, "users"), where("pin", "==", pinInserito));
+                const querySnapshot = await getDocs(q);
+
+                if (!querySnapshot.empty) {
+                    const dati = querySnapshot.docs[0].data();
+                    localStorage.setItem("geolia_user", JSON.stringify(dati));
+                    alert("Bentornato " + dati.nome_attivita);
+                    window.location.href = "/" + dati.url_pagina;
+                } else {
+                    alert("PIN non valido.");
+                }
+            } catch (e) { alert("Errore: " + e.message); }
         };
     </script>
 </body>
