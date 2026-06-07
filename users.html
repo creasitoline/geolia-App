@@ -76,7 +76,8 @@
                     url_pagina: slug
                 });
                 alert("Registrato correttamente!");
-                window.location.href = "/" + slug;
+                // Reindirizza a index.html con il parametro dell'utente
+                window.location.href = "index.html?user=" + slug;
             } catch (e) { alert("Errore: " + e.message); }
         };
 
@@ -92,7 +93,8 @@
                     const dati = querySnapshot.docs[0].data();
                     localStorage.setItem("geolia_user", JSON.stringify(dati));
                     alert("Bentornato " + dati.nome_attivita);
-                    window.location.href = "/" + dati.url_pagina;
+                    // Reindirizza a index.html con il parametro dell'utente
+                    window.location.href = "index.html?user=" + dati.url_pagina;
                 } else {
                     alert("PIN non valido.");
                 }
