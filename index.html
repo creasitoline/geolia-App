@@ -3,112 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GeoLiA | Gestione</title>
+    <title>GeoLiA | Profilo</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { --blu: #3b5998; --giallo: #ffc107; --viola: #6f42c1; --bg: #f3f3f3; }
         body { font-family: 'Segoe UI', system-ui; margin: 0; background: var(--bg); padding-bottom: 90px; }
         header { background: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--blu); }
-        .fab { position: fixed; bottom: 80px; right: 20px; width: 60px; height: 60px; background: var(--viola); color: white; border-radius: 50%; border: none; font-size: 24px; box-shadow: 0 4px 10px rgba(111, 66, 193, 0.3); z-index: 100; }
         .nav-bottom { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 10px 0; border-top: 2px solid var(--blu); z-index: 90; }
         .nav-item { text-decoration: none; color: var(--blu); text-align: center; flex: 1; font-size: 11px; cursor: pointer; }
         .nav-item i { display: block; font-size: 1.3rem; margin-bottom: 3px; }
-        .modal { position: fixed; bottom: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; z-index: 500; align-items: flex-end; }
-        .modal-content { background: white; width: 100%; max-width: 400px; margin: 0 auto; padding: 20px; border-radius: 20px 20px 0 0; max-height: 85vh; overflow-y: auto; border-top: 5px solid var(--giallo); }
-        .form-input { width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        .btn-action { padding: 12px; border: none; border-radius: 8px; background: #eee; cursor: pointer; font-weight: bold; width: 100%; margin: 5px 0; color: var(--blu); }
-        .btn-pubblica { background: var(--viola) !important; color: white !important; }
+        .box-centrale { max-width: 400px; margin: 20px auto; padding: 20px; background: white; border-radius: 15px; border-top: 5px solid var(--giallo); }
+        .form-input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .btn-action { padding: 12px; border: none; border-radius: 8px; background: var(--blu); color: white; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
+        .link-switch { display: block; margin-top: 15px; color: var(--viola); cursor: pointer; font-size: 14px; text-align: center; }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <header><img src="logo.png" style="height:35px;"><i class="fa-solid fa-bell" style="color: var(--blu);"></i></header>
-    <div id="feed" style="padding:15px;"><h3>Post Recenti</h3></div>
-    <button class="fab" onclick="document.getElementById('modalForm').style.display='flex'">+</button>
+    <header><img src="logo.png" style="height:35px;"><i class="fa-solid fa-user-circle" style="color: var(--blu);"></i></header>
 
-    <nav class="nav-bottom">
-        <a class="nav-item"><i class="fa-solid fa-house"></i>Home</a>
-        <a class="nav-item"><i class="fa-solid fa-filter"></i>Filtri</a>
-        <a class="nav-item"><i class="fa-solid fa-map-marked-alt"></i>Mappa</a>
-        <a class="nav-item"><i class="fa-solid fa-user"></i>Profilo</a>
-        <a class="nav-item"><i class="fa-solid fa-chart-line"></i>Admin</a>
-    </nav>
+    <div class="box-centrale">
+        <div id="div-login">
+            <h3 style="color:var(--blu)">Accedi</h3>
+            <input type="password" id="login-pin" class="form-input" placeholder="Inserisci il tuo PIN">
+            <button class="btn-action" onclick="eseguiAccesso()">Entra</button>
+            <span class="link-switch" onclick="toggleForm()">Non sei registrato? Registrati qui</span>
+        </div>
 
-    <div id="modalForm" class="modal">
-        <div class="modal-content">
-            <div id="step1">
-                <h3 style="color: var(--blu);">Cosa pubblichi?</h3>
-                <select id="catSelect" class="form-input">
-                    <option value="offerte">🏷️ Offerte</option>
-                    <option value="menu">🍽️ Menu</option>
-                    <option value="marketplace">📦 Marketplace</option>
-                    <option value="guasto">🛠️ Guasto</option>
-                </select>
-                <button class="btn-action" onclick="document.getElementById('cameraInput').click()">📸 Scatta Foto</button>
-                <button class="btn-action" onclick="document.getElementById('fileInput').click()">📁 Carica Galleria</button>
-            </div>
-            <div id="step2" class="hidden">
-                <img id="preview" style="width:100%; border-radius:10px; margin-bottom:10px; border: 2px solid var(--giallo);">
-                <input type="text" id="titolo" class="form-input" placeholder="Titolo">
-                <textarea id="descrizione" class="form-input" placeholder="Descrizione"></textarea>
-                <div style="display:flex; gap:5px;">
-                    <input type="number" id="prezzo" class="form-input" placeholder="Prezzo">
-                    <select id="valuta" class="form-input" style="width:auto;"><option>CHF</option><option>EUR</option></select>
-                </div>
-                <button class="btn-action btn-pubblica" onclick="confermaInvio()">✅ Pubblica</button>
-                <button class="btn-action" onclick="location.reload()">❌ Annulla</button>
-            </div>
+        <div id="div-registra" class="hidden">
+            <h3 style="color:var(--viola)">Registrazione</h3>
+            <input type="text" id="reg-nome" class="form-input" placeholder="Nome Attività">
+            <input type="text" id="reg-tel" class="form-input" placeholder="Telefono">
+            <input type="password" id="reg-pin" class="form-input" placeholder="Crea un PIN">
+            <button class="btn-action" style="background:var(--viola)" onclick="eseguiRegistrazione()">Crea Account</button>
+            <span class="link-switch" onclick="toggleForm()">Hai già un account? Accedi</span>
         </div>
     </div>
 
-    <input type="file" id="cameraInput" class="hidden" accept="image/*" capture="environment" onchange="gestisciFoto(event)">
-    <input type="file" id="fileInput" class="hidden" accept="image/*" onchange="gestisciFoto(event)">
+    <nav class="nav-bottom">
+        <a href="index.html" class="nav-item"><i class="fa-solid fa-house"></i>Home</a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-filter"></i>Filtri</a>
+        <a href="maps.html" class="nav-item"><i class="fa-solid fa-map-marked-alt"></i>Mappa</a>
+        <a href="users.html" class="nav-item" style="color:var(--viola)"><i class="fa-solid fa-user"></i>Profilo</a>
+        <a href="admin.html" class="nav-item"><i class="fa-solid fa-chart-line"></i>Admin</a>
+    </nav>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
-        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
-        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-storage.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyDAJIxBD8qGO6h8lAZeLnotm7GySpZrz_8", authDomain: "geolia-app.firebaseapp.com", projectId: "geolia-app", storageBucket: "geolia-app.firebasestorage.app", messagingSenderId: "341223455235", appId: "1:341223455235:web:6baa3fd3b9db6eaa22ec36", measurementId: "G-7SPH65RFH7" };
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const storage = getStorage(app);
-        let fileTemporaneo = null;
+        const db = getFirestore(initializeApp(firebaseConfig));
 
-        window.gestisciFoto = (e) => {
-            fileTemporaneo = e.target.files[0];
-            if (!fileTemporaneo) return;
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-                document.getElementById('preview').src = ev.target.result;
-                document.getElementById('step1').classList.add('hidden');
-                document.getElementById('step2').classList.remove('hidden');
-            };
-            reader.readAsDataURL(fileTemporaneo);
+        window.toggleForm = () => {
+            document.getElementById('div-login').classList.toggle('hidden');
+            document.getElementById('div-registra').classList.toggle('hidden');
         };
 
-        window.confermaInvio = async () => {
-            if (!fileTemporaneo) return;
-            const categoria = document.getElementById('catSelect').value;
+        window.eseguiRegistrazione = async () => {
+            const nome = document.getElementById('reg-nome').value;
+            const tel = document.getElementById('reg-tel').value;
+            const pin = document.getElementById('reg-pin').value;
+            const slug = "ch-ti-" + nome.toLowerCase().replace(/ /g, '-');
+            
             try {
-                const storageRef = ref(storage, categoria + '/' + Date.now() + '_' + fileTemporaneo.name);
-                const snapshot = await uploadBytes(storageRef, fileTemporaneo);
-                const url = await getDownloadURL(snapshot.ref);
-                await addDoc(collection(db, "posts"), {
-                    categoria: categoria,
-                    titolo: document.getElementById('titolo').value,
-                    descrizione: document.getElementById('descrizione').value,
-                    prezzo: document.getElementById('prezzo').value,
-                    valuta: document.getElementById('valuta').value,
-                    foto: url,
-                    data: new Date().toISOString()
+                await setDoc(doc(db, "users", slug), {
+                    nome_attivita: nome,
+                    telefono: tel,
+                    pin: pin,
+                    ruolo: "utente",
+                    url_pagina: slug
                 });
-                alert("Pubblicato con successo in: " + categoria.toUpperCase());
-                location.reload();
-            } catch (error) {
-                alert("Errore caricamento: " + error.message);
-            }
+                alert("Registrato correttamente!");
+                window.location.href = "/" + slug;
+            } catch (e) { alert("Errore: " + e.message); }
+        };
+
+        window.eseguiAccesso = () => {
+            const pin = document.getElementById('login-pin').value;
+            alert("Controllo PIN: " + pin + " (Logica di verifica da collegare a DB)");
         };
     </script>
 </body>
