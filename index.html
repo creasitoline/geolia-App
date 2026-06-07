@@ -3,30 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Geolia | Gestione</title>
+    <title>Geolia | Gestione Integrata</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { --primary: #ffffff; --text: #131921; --accent: #2ecc71; --bg: #f3f3f3; }
         body { font-family: 'Segoe UI', system-ui; margin: 0; background: var(--bg); padding-bottom: 90px; }
-        header { background: var(--primary); padding: 15px; display: flex; justify-content: space-between; border-bottom: 1px solid #ddd; }
-        .logo-img { height: 35px; }
+        header { background: var(--primary); padding: 10px 15px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #ddd; }
         .fab { position: fixed; bottom: 80px; right: 20px; width: 60px; height: 60px; background: var(--accent); color: white; border-radius: 50%; border: none; font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 100; }
         
-        /* Modale */
-        .modal { position: fixed; bottom: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; z-index: 500; align-items: flex-end; }
-        .modal-content { background: white; width: 100%; max-width: 400px; margin: 0 auto; padding: 20px; border-radius: 20px 20px 0 0; }
-        .form-input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .modal { position: fixed; bottom: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; z-index: 500; align-items: flex-end; }
+        .modal-content { background: white; width: 100%; max-width: 400px; margin: 0 auto; padding: 20px; border-radius: 20px 20px 0 0; max-height: 90vh; overflow-y: auto; }
+        .form-input { width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .btn-dual { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .btn-action { padding: 12px; border: none; border-radius: 8px; background: #eee; cursor: pointer; font-weight: bold; }
         .hidden { display: none !important; }
-        
-        .nav-bottom { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #ddd; z-index: 90; }
-        .nav-item { color: #555; text-align: center; flex: 1; font-size: 11px; text-decoration: none; }
-        .nav-item i { display: block; font-size: 1.3rem; margin-bottom: 3px; }
     </style>
 </head>
 <body>
 
-    <header><img src="logo.png" class="logo-img"><i class="fa-solid fa-bell"></i></header>
-    <div class="main-layout" id="feed"><h3>Post Recenti</h3></div>
+    <header><img src="logo.png" style="height:35px;"><i class="fa-solid fa-bell"></i></header>
     <button class="fab" onclick="document.getElementById('modalForm').style.display='flex'">+</button>
 
     <div id="modalForm" class="modal">
@@ -39,57 +34,57 @@
                     <option value="marketplace">📦 Marketplace</option>
                     <option value="guasto">🛠️ Segnala Guasto</option>
                 </select>
-                <button class="form-input" style="background:#eee;" onclick="document.getElementById('cameraInput').click()">📸 Carica Foto</button>
+                <div class="btn-dual">
+                    <button class="btn-action" onclick="document.getElementById('cameraInput').click()">📸 Scatta</button>
+                    <button class="btn-action" onclick="document.getElementById('fileInput').click()">📁 Carica</button>
+                </div>
             </div>
+
             <div id="step2" class="hidden">
-                <img id="preview" style="width:100%; border-radius:10px;">
+                <img id="preview" style="width:100%; border-radius:10px; margin-bottom:10px;">
                 <input type="text" id="titolo" class="form-input" placeholder="Titolo">
                 <textarea id="descrizione" class="form-input" placeholder="Descrizione"></textarea>
-                <div style="display:flex; gap:10px;">
+                <div style="display:flex; gap:5px;">
                     <input type="number" id="prezzo" class="form-input" placeholder="Prezzo">
-                    <select id="valuta" class="form-input" style="width:100px;"><option>CHF</option><option>EUR</option></select>
+                    <select id="valuta" class="form-input" style="width:auto;"><option>CHF</option><option>EUR</option></select>
                 </div>
-                <button class="form-input" style="background:var(--accent); color:white;" onclick="eseguiUpload()">✅ Conferma Pubblicazione</button>
+                <button class="form-input" style="background:var(--accent); color:white;" onclick="eseguiUpload()">✅ Invia Pubblicazione</button>
+                <button class="form-input" onclick="location.reload()">❌ Annulla</button>
             </div>
         </div>
     </div>
 
-    <input type="file" id="cameraInput" class="hidden" accept="image/*" onchange="mostraAnteprima(event)">
-
-    <nav class="nav-bottom">
-        <a class="nav-item"><i class="fa-solid fa-house"></i>Home</a>
-        <a class="nav-item"><i class="fa-solid fa-filter"></i>Filtri</a>
-        <a class="nav-item"><i class="fa-solid fa-map-marked-alt"></i>Mappa</a>
-        <a class="nav-item"><i class="fa-solid fa-user"></i>Profilo</a>
-    </nav>
+    <input type="file" id="cameraInput" class="hidden" accept="image/*" capture="environment" onchange="mostraAnteprima(event)">
+    <input type="file" id="fileInput" class="hidden" accept="image/*" onchange="mostraAnteprima(event)">
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-storage.js";
 
-        const firebaseConfig = { /* INSERISCI CONFIGURAZIONE */ };
+        const firebaseConfig = { /* INSERISCI I TUOI DATI */ };
         const db = getFirestore(initializeApp(firebaseConfig));
         const storage = getStorage();
-        let fileDaCaricare = null;
+        let fileTemporaneo = null;
 
         window.mostraAnteprima = (e) => {
-            fileDaCaricare = e.target.files[0];
+            fileTemporaneo = e.target.files[0];
             const reader = new FileReader();
             reader.onload = (ev) => {
                 document.getElementById('preview').src = ev.target.result;
                 document.getElementById('step1').classList.add('hidden');
                 document.getElementById('step2').classList.remove('hidden');
             };
-            reader.readAsDataURL(fileDaCaricare);
+            reader.readAsDataURL(fileTemporaneo);
         };
 
         window.eseguiUpload = async () => {
-            const storageRef = ref(storage, 'posts/' + Date.now() + '.jpg');
-            const snapshot = await uploadBytes(storageRef, fileDaCaricare);
+            if (!fileTemporaneo) return;
+            const storageRef = ref(storage, 'posts/' + Date.now());
+            const snapshot = await uploadBytes(storageRef, fileTemporaneo);
             const url = await getDownloadURL(snapshot.ref);
 
-            const post = await addDoc(collection(db, "posts"), {
+            await addDoc(collection(db, "posts"), {
                 tipo: document.getElementById('catSelect').value,
                 titolo: document.getElementById('titolo').value,
                 descrizione: document.getElementById('descrizione').value,
