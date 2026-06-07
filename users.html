@@ -1,40 +1,21 @@
-<div id="login-form">
-    <input type="text" id="nome_attivita" placeholder="Nome Attività">
-    <input type="text" id="indirizzo" placeholder="Indirizzo (es. Lugano)">
-    <input type="text" id="telefono" placeholder="Telefono">
-    <input type="text" id="pin" placeholder="Crea il tuo PIN (es. 1234)">
-    <button onclick="registraNuovoUtente()">Registrati e Accedi</button>
-</div>
+<header>
+    <img src="logo.png" alt="Logo">
+</header>
 
-<script type="module">
-    import { doc, setDoc, db } from "./firebase-config.js"; // Il tuo file di config
+<main id="container-modulo">
+    <div id="vista-login">
+        <h3>Accedi con il tuo PIN</h3>
+        <input type="password" id="pin-login" placeholder="Inserisci il tuo PIN">
+        <button onclick="eseguiAccesso()">Entra</button>
+        <p onclick="mostraRegistrazione()">Non hai un account? Registrati qui</p>
+    </div>
 
-    window.registraNuovoUtente = async () => {
-        const nome = document.getElementById('nome_attivita').value;
-        const indirizzo = document.getElementById('indirizzo').value;
-        const tel = document.getElementById('telefono').value;
-        const pin = document.getElementById('pin').value;
-        
-        // Creiamo l'ID univoco basato sul nome (slug)
-        const idGenerato = "ch-ti-" + nome.toLowerCase().replace(/ /g, '-');
-        
-        try {
-            // Salva direttamente su Firestore
-            await setDoc(doc(db, "users", idGenerato), {
-                nome_attivita: nome,
-                indirizzo: indirizzo,
-                telefono: tel,
-                pin: pin,
-                ruolo: "utente",
-                url_pagina: idGenerato,
-                data_creazione: new Date().toISOString()
-            });
-            
-            alert("Registrazione completata! Il tuo ID pagina è: " + idGenerato);
-            // Reindirizza l'utente alla sua nuova pagina
-            window.location.href = "/" + idGenerato; 
-        } catch (error) {
-            alert("Errore durante la registrazione: " + error.message);
-        }
-    };
-</script>
+    <div id="vista-registrazione" style="display:none;">
+        <h3>Registrazione Nuova Attività</h3>
+        <input type="text" id="nome" placeholder="Nome Attività">
+        <input type="text" id="telefono" placeholder="Telefono">
+        <input type="password" id="pin-nuovo" placeholder="Crea un PIN">
+        <button onclick="eseguiRegistrazione()">Crea Account</button>
+        <p onclick="mostraLogin()">Hai già un account? Accedi</p>
+    </div>
+</main>
